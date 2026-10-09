@@ -101,10 +101,13 @@ BleKeyboard::BleKeyboard(std::string deviceName, std::string deviceManufacturer,
     , deviceManufacturer(std::string(deviceManufacturer).substr(0,15))
     , batteryLevel(batteryLevel) {}
 
+
+
+
 void BleKeyboard::begin(void)
 {
   BLEDevice::init(String(deviceName.c_str()));
-  BLEServer* pServer = BLEDevice::createServer();
+  pServer = BLEDevice::createServer();	// Use class-level pServer instead of local variable to allow access in end()
   pServer->setCallbacks(this);
 
   hid = new BLEHIDDevice(pServer);
@@ -146,9 +149,28 @@ void BleKeyboard::begin(void)
   ESP_LOGD(LOG_TAG, "Advertising started!");
 }
 
+
+
 void BleKeyboard::end(void)
 {
+  if (advertising != nullptr) {
+    advertising->stop();
+  }
+  
+  if (pServer != nullptr) {
+    pServer->setCallbacks(nullptr);
+  }
+
+  this->connected = false;
+
+  if (hid != nullptr) {
+    delete hid;
+    hid = nullptr;
+  }
 }
+
+
+
 
 bool BleKeyboard::isConnected(void) {
   return this->connected;

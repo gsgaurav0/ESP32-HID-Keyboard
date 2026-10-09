@@ -131,6 +131,7 @@ typedef struct
 class BleKeyboard : public Print, public BLEServerCallbacks, public BLECharacteristicCallbacks
 {
 private:
+  BLEServer* pServer;
   BLEHIDDevice* hid;
   BLECharacteristic* inputKeyboard;
   BLECharacteristic* outputKeyboard;
